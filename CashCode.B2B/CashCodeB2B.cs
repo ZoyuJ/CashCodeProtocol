@@ -37,7 +37,7 @@
             ┣━━━━━━━━━━━▶┃
             ┃            ┃
       ◆Controller Found CRC Failed
-        Controller   CashCode
+        Controller        CashCode
           ━━┫    Command      ┃
          ▲  ┣━━━━━━━━━━━━━━━━▶┃
             ┃ Data,CRC Failed ┃
