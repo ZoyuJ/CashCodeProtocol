@@ -242,34 +242,107 @@
     /// Code|SubCode
     /// </summary>
     public enum PollRecivedPackageType {
+      /// <summary>
+      /// 上电
+      /// </summary>
       PowerUp = 0x1000 | 0x0000,
+      /// <summary>
+      /// 上电，有纸币在识别头
+      /// </summary>
       PowerUpWithBillInValidator = 0x1100 | 0x0000,
+      /// <summary>
+      /// 上电，有纸币在钱箱
+      /// </summary>
       PowerUpWithBillInChassis = 0x1200 | 0x0000,
       Initialize = 0x1300 | 0x0000,
-      Idling = 0x1300 | 0x0000,
-      Accepting = 0x1400 | 0x0000,
+      /// <summary>
+      /// 空闲，已准备好接受放入纸钞
+      /// </summary>
+      Idling = 0x1400 | 0x0000,
+      /// <summary>
+      /// 有新纸钞放入
+      /// </summary>
+      Accepting = 0x1500 | 0x0000,
+      /// <summary>
+      /// 正在压钞
+      /// </summary>
       Stacking = 0x1700 | 0x0000,
       Returning = 0x1800 | 0x0000,
       Disabled = 0x1900 | 0x0000,
+      /// <summary>
+      /// 保持
+      /// </summary>
       Holding = 0x1A00 | 0x0000,
       Busy = 0x1B00 | 0x0000,
 
+
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Insertion = 0x1C00 | 0x0060,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Magnetic = 0x1C00 | 0x0061,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Bill = 0x1C00 | 0x0062,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Multiply = 0x1C00 | 0x0063,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Conveying = 0x1C00 | 0x0064,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Identification = 0x1C00 | 0x0065,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Verification = 0x1C00 | 0x0066,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Optic = 0x1C00 | 0x0067,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Inhibit = 0x1C00 | 0x0068,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Capacity = 0x1C00 | 0x0069,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Operation = 0x1C00 | 0x006A,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Length = 0x1C00 | 0x006C,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_UV = 0x1C00 | 0x006D,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Barcode_Unrecognized = 0x1C00 | 0x0092,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Barcode_IncorrectNum = 0x1C00 | 0x0093,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Barcode_UnknownStart = 0x1C00 | 0x0094,
+      /// <summary>
+      /// 不识别
+      /// </summary>
       Rejected_Barcode_UnknownStop = 0x1C00 | 0x0095,
 
       Dispensing_Recycling2Dispenser = 0x1D00 | 0x0000,
@@ -288,25 +361,45 @@
 
       InvalidCommand = 0x3000 | 0x0000,
 
+      /// <summary>
+      /// 钱箱满
+      /// </summary>
       DropCassetteFull = 0x4100 | 0x0000,
+      /// <summary>
+      /// 钱箱已移除
+      /// </summary>
       DropCassetteRemoved = 0x4200 | 0x0000,
 
+      /// <summary>
+      /// 接受口卡币
+      /// </summary>
       JammedInAcceptor = 0x4300 | 0x0000,
+      /// <summary>
+      /// 钱箱卡币
+      /// </summary>
       JammedInStacker = 0x4400 | 0x0000,
-
+      /// <summary>
+      /// 欺骗行为
+      /// </summary>
       Cheated = 0x4500 | 0x0000,
-
+      /// <summary>
+      /// 通用故障码
+      /// </summary>
       GenericErrorCode = 0x4700 | 0x0000,
       /// <summary>
+      /// 暂存纸币
       /// SubCode:BillType
       /// </summary>
       ESCROW = 0x8000 | 0x0000,
       /// <summary>
+      /// 已压钞
       /// SubCode:BillType
       /// Data:L=1B
       /// </summary>
       PackedOrStacked = 0x8100 | 0x0000,
-
+      /// <summary>
+      /// 纸币被退回
+      /// </summary>
       Returned = 0x8200 | 0x0000,
 
       WaittingOfDecision = 0x8300 | 0x0100,
