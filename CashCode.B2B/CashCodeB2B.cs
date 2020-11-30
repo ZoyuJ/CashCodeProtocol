@@ -117,18 +117,19 @@
 
     public void StopPolling() => EnablePolling = false;
     public void StartPolling() => EnablePolling = true;
+    protected static readonly byte[] EMPTYDATAARRAY = new byte[0];
 
-    public void SendNAK() => EnqueuePacket(GeneratPackage(0xFF, new byte[] { }));
-    public void SendACK() => EnqueuePacket(GeneratPackage(0x00, new byte[] { }));
-    public void SendStack() => EnqueuePacket(GeneratPackage(0x35, new byte[] { }));
-    public void SendReset() => EnqueuePacket(GeneratPackage(0x30, new byte[] { }));
+    public void SendNAK() => EnqueuePacket(GeneratPackage(0xFF, EMPTYDATAARRAY));
+    public void SendACK() => EnqueuePacket(GeneratPackage(0x00, EMPTYDATAARRAY));
+    public void SendStack() => EnqueuePacket(GeneratPackage(0x35, EMPTYDATAARRAY));
+    public void SendReset() => EnqueuePacket(GeneratPackage(0x30, EMPTYDATAARRAY));
     public void SendEnableBillTypes(byte value) => EnqueuePacket(GeneratPackage(0x34, new byte[] { 0, 0, value, 0, 0, 0 }));
 
-    public void SendReturn() => EnqueuePacket(GeneratPackage(0x36, new byte[] { }));
-    public void SendPoll() => EnqueuePacket(GeneratPackage(0x33, new byte[] { }));
-    public void SendIdentification() => EnqueuePacket(GeneratPackage(0x37, new byte[] { }));
-    public void SendStatus() => EnqueuePacket(GeneratPackage(0x31, new byte[] { }));
-    public void SendSecurity(byte value) => EnqueuePacket(GeneratPackage(0x32, new byte[] { 0, 0, value }));
+    public void SendReturn() => EnqueuePacket(GeneratPackage(0x36, EMPTYDATAARRAY));
+    public void SendPoll() => EnqueuePacket(GeneratPackage(0x33, EMPTYDATAARRAY));
+    public void SendIdentification() => EnqueuePacket(GeneratPackage(0x37, EMPTYDATAARRAY));
+    public void SendStatus() => EnqueuePacket(GeneratPackage(0x31, EMPTYDATAARRAY));
+    public void SendSecurity(byte value) => EnqueuePacket(GeneratPackage(0x32, EMPTYDATAARRAY));
 
     protected virtual byte[] GeneratPackage(byte command, byte[] data) {
       int Len = data.Length + 6;
