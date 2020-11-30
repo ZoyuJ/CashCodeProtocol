@@ -10,7 +10,7 @@
   class B2BReceivingProcessing {
     public B2BReceivingProcessing(CashCodeB2B Device, Dictionary<byte, int> ValueMap) {
       _ValueMap = ValueMap;
-      Device.OnRecivedHandler += Device_OnRecivedHandler;
+      //Device.OnRecivedHandler += Device_OnRecivedHandler;
     }
 
     /*
@@ -22,84 +22,84 @@
 
      */
 
-    private void Device_OnRecivedHandler(CashCodeB2B.PollRecivedPackageType MainType, byte SubTypeType, byte[] arg3) {
-      switch (MainType) {
-        case CashCodeB2B.PollRecivedPackageType.Idling:
-          
-          break;
-        case CashCodeB2B.PollRecivedPackageType.Accepting:
+    private void Device_OnRecivedHandler(Command Packet) {
+      switch (Packet.ResponseMark) {
+        case PollRecivedPackageType.Idling:
 
           break;
-        case CashCodeB2B.PollRecivedPackageType.Stacking:
+        case PollRecivedPackageType.Accepting:
+
           break;
-        case CashCodeB2B.PollRecivedPackageType.Returning:
+        case PollRecivedPackageType.Stacking:
           break;
-        case CashCodeB2B.PollRecivedPackageType.Disabled:
+        case PollRecivedPackageType.Returning:
           break;
-        case CashCodeB2B.PollRecivedPackageType.Holding:
+        case PollRecivedPackageType.Disabled:
           break;
-        case CashCodeB2B.PollRecivedPackageType.ESCROW:
+        case PollRecivedPackageType.Holding:
           break;
-        case CashCodeB2B.PollRecivedPackageType.PackedOrStacked:
+        case PollRecivedPackageType.ESCROW:
           break;
-        case CashCodeB2B.PollRecivedPackageType.Returned:
+        case PollRecivedPackageType.PackedOrStacked:
           break;
-        case CashCodeB2B.PollRecivedPackageType.Busy:
+        case PollRecivedPackageType.Returned:
           break;
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Insertion:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Magnetic:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Bill:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Multiply:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Conveying:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Identification:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Verification:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Optic:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Inhibit:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Capacity:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Operation:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Length:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_UV:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Barcode_Unrecognized:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Barcode_IncorrectNum:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Barcode_UnknownStart:
-        case CashCodeB2B.PollRecivedPackageType.Rejected_Barcode_UnknownStop:
+        case PollRecivedPackageType.Busy:
           break;
-        case CashCodeB2B.PollRecivedPackageType.Dispensing_Recycling2Dispenser:
-        case CashCodeB2B.PollRecivedPackageType.Dispensing_WaittingCustomeTake:
+        case PollRecivedPackageType.Rejected_Insertion:
+        case PollRecivedPackageType.Rejected_Magnetic:
+        case PollRecivedPackageType.Rejected_Bill:
+        case PollRecivedPackageType.Rejected_Multiply:
+        case PollRecivedPackageType.Rejected_Conveying:
+        case PollRecivedPackageType.Rejected_Identification:
+        case PollRecivedPackageType.Rejected_Verification:
+        case PollRecivedPackageType.Rejected_Optic:
+        case PollRecivedPackageType.Rejected_Inhibit:
+        case PollRecivedPackageType.Rejected_Capacity:
+        case PollRecivedPackageType.Rejected_Operation:
+        case PollRecivedPackageType.Rejected_Length:
+        case PollRecivedPackageType.Rejected_UV:
+        case PollRecivedPackageType.Rejected_Barcode_Unrecognized:
+        case PollRecivedPackageType.Rejected_Barcode_IncorrectNum:
+        case PollRecivedPackageType.Rejected_Barcode_UnknownStart:
+        case PollRecivedPackageType.Rejected_Barcode_UnknownStop:
           break;
-        case CashCodeB2B.PollRecivedPackageType.Unloading_Recycling2Drop:
-        case CashCodeB2B.PollRecivedPackageType.Unloading_Recycling2Drop_TooMuchBills:
+        case PollRecivedPackageType.Dispensing_Recycling2Dispenser:
+        case PollRecivedPackageType.Dispensing_WaittingCustomeTake:
           break;
-        case CashCodeB2B.PollRecivedPackageType.SettingTypeCassette:
+        case PollRecivedPackageType.Unloading_Recycling2Drop:
+        case PollRecivedPackageType.Unloading_Recycling2Drop_TooMuchBills:
           break;
-        case CashCodeB2B.PollRecivedPackageType.Dispensed:
+        case PollRecivedPackageType.SettingTypeCassette:
           break;
-        case CashCodeB2B.PollRecivedPackageType.Unloaded:
+        case PollRecivedPackageType.Dispensed:
           break;
-        case CashCodeB2B.PollRecivedPackageType.InvalidBillNumber:
+        case PollRecivedPackageType.Unloaded:
           break;
-        case CashCodeB2B.PollRecivedPackageType.SettedTypeCassette:
+        case PollRecivedPackageType.InvalidBillNumber:
           break;
-        case CashCodeB2B.PollRecivedPackageType.InvalidCommand:
+        case PollRecivedPackageType.SettedTypeCassette:
           break;
-        case CashCodeB2B.PollRecivedPackageType.DropCassetteFull:
+        case PollRecivedPackageType.InvalidCommand:
           break;
-        case CashCodeB2B.PollRecivedPackageType.DropCassetteRemoved:
+        case PollRecivedPackageType.DropCassetteFull:
           break;
-        case CashCodeB2B.PollRecivedPackageType.JammedInAcceptor:
-        case CashCodeB2B.PollRecivedPackageType.JammedInStacker:
+        case PollRecivedPackageType.DropCassetteRemoved:
           break;
-        case CashCodeB2B.PollRecivedPackageType.Cheated:
+        case PollRecivedPackageType.JammedInAcceptor:
+        case PollRecivedPackageType.JammedInStacker:
           break;
-        case CashCodeB2B.PollRecivedPackageType.GenericErrorCode:
+        case PollRecivedPackageType.Cheated:
           break;
-        case CashCodeB2B.PollRecivedPackageType.WaittingOfDecision:
+        case PollRecivedPackageType.GenericErrorCode:
           break;
-        case CashCodeB2B.PollRecivedPackageType.PowerUp:
-        case CashCodeB2B.PollRecivedPackageType.PowerUpWithBillInValidator:
-        case CashCodeB2B.PollRecivedPackageType.PowerUpWithBillInChassis:
-        case CashCodeB2B.PollRecivedPackageType.Initialize:
-     
+        case PollRecivedPackageType.WaittingOfDecision:
+          break;
+        case PollRecivedPackageType.PowerUp:
+        case PollRecivedPackageType.PowerUpWithBillInValidator:
+        case PollRecivedPackageType.PowerUpWithBillInChassis:
+        case PollRecivedPackageType.Initialize:
+
         default:
           break;
       }
