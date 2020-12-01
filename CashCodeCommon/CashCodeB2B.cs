@@ -12,11 +12,7 @@
 
   public class CashCodeB2B : IDisposable {
 
-    public CashCodeB2B(CashCounterCfg Cfg, ILogger<CashCodeB2B> Logger) {
-      _Cfg = Cfg;
-      _CTkS = new CancellationTokenSource();
-      _SerialPort = new SerialPort(_Cfg.DecicePort);
-    }
+
     /*
      ◆NO RESPONSE
         Controller   CashCode
@@ -65,12 +61,22 @@
             ┣━━━━━━━━━━━━━━━━▶┃
 
      */
+    public CashCodeB2B(CashCodeB2BCfg Cfg, ILogger<CashCodeB2B> Logger) {
+      _Logger = Logger;
+      _Cfg = Cfg;
+      _CTkS = new CancellationTokenSource();
+      _SerialPort = new SerialPort(_Cfg.DecicePort);
+    }
+    protected readonly ILogger<CashCodeB2B> _Logger;
     protected readonly CancellationTokenSource _CTkS;
     protected readonly SerialPort _SerialPort;
-    protected readonly CashCounterCfg _Cfg;
+    protected readonly CashCodeB2BCfg _Cfg;
 
     protected readonly static byte DEVICE_TYPE = 0x03;
 
+    /// <summary>
+    /// Connect to serial port
+    /// </summary>
     public virtual void Connect() {
       _SerialPort.BaudRate = 9600;
       _SerialPort.DataBits = 8;
@@ -79,11 +85,28 @@
       _SerialPort.Open();
     }
 
+    /// <summary>
+    /// default delay timespan(ms) between every commands
+    /// </summary>
     protected const int POLLDELAY = 200;
+    /// <summary>
+    /// ignore this,anytime u sent NAK package,must sent Command again in 10ms,in this impl just sent the command immediately
+    /// </summary>
     protected const int NAKDELAY = 5;
+    /// <summary>
+    /// if got ack,then send next command,so this value is equal to 'POLLDELAY'
+    /// </summary>
     protected const int ACKDELAY = 200;
+    /// <summary>
+    /// in document,device will response in 100000Ticks,but always Timedout, maybe 'Tick' in document is not equal to c#'s
+    /// </summary>
     protected const int TIMEDOUT = 100000;
     public virtual bool EnablePolling { get; protected set; } = true;
+    /// <summary>
+    /// Enqueue Reset,then Enqueue EnableBillTypes,then Enqueue Poll,get in loop,
+    /// if Queue has no items,enqueue a Poll request automatically
+    /// </summary>
+    /// <returns></returns>
     public virtual async Task StartPollingLoop() {
       SendReset();
       SendEnableBillTypes(_Cfg.EnableCashType);
@@ -132,12 +155,11 @@
       this.Dispose();
     }
 
-    //public void StopPolling() => EnablePolling = false;
-    //public void StartPolling() => EnablePolling = true;
+    /// <summary>
+    /// if command has no data
+    /// </summary>
     protected static readonly byte[] EMPTYDATAARRAY = new byte[0];
 
-    //public void SendNAK() => EnqueuePacket(GeneratPackage(0xFF, EMPTYDATAARRAY));
-    //public void SendACK() => EnqueuePacket(GeneratPackage(0x00, EMPTYDATAARRAY));
     public void SendStack() => EnqueuePacket(GeneratPackage(CommandMark.Stack, EMPTYDATAARRAY));
     public void SendReset() => EnqueuePacket(GeneratPackage(CommandMark.Reset, EMPTYDATAARRAY));
     public void SendEnableBillTypes(byte value) => EnqueuePacket(GeneratPackage(CommandMark.EnableBillTypes, new byte[] { 0, 0, value, 0, 0, 0 }));
@@ -148,7 +170,12 @@
     public void SendStatus() => EnqueuePacket(GeneratPackage(CommandMark.GetStatus, EMPTYDATAARRAY));
     public void SendSecurity(byte value) => EnqueuePacket(GeneratPackage(CommandMark.SetSecurity, EMPTYDATAARRAY));
 
-
+    /// <summary>
+    /// generate packe,fill LEN,CRC
+    /// </summary>
+    /// <param name="Command"></param>
+    /// <param name="Data"></param>
+    /// <returns></returns>
     protected virtual Command GeneratPackage(byte Command, byte[] Data) {
       int Len = Data.Length + 6;
       byte[] CommandArr = new byte[Data.Length + 4 + 2];
@@ -162,17 +189,35 @@
       CommandArr[Len - 2] = (byte)(crcValue & 0xFF);
       return new Command() { CommandData = CommandArr, CommandMark = null };
     }
+    /// <summary>
+    /// generate packe,fill LEN,CRC
+    /// </summary>
+    /// <param name="Command"></param>
+    /// <param name="Data"></param>
+    /// <returns></returns>
     protected virtual Command GeneratPackage(CommandMark Command, byte[] Data) {
       var CMDPack = GeneratPackage((byte)Command, Data);
       CMDPack.CommandMark = Command;
       return CMDPack;
     }
+    /// <summary>
+    /// enqueue command
+    /// </summary>
+    /// <param name="Packet"></param>
     protected virtual void EnqueuePacket(in Command Packet) => _PackageQueue.Enqueue(Packet);
+    /// <summary>
+    /// send package driectly,use this method to send ACK,NAK
+    /// </summary>
+    /// <param name="Command"></param>
+    /// <param name="data"></param>
     public virtual void SendPacket(byte Command, byte[] data) {
       var Cmd = GeneratPackage(Command, data);
       _SerialPort.Write(Cmd.CommandData, 0, Cmd.CommandData.Length);
     }
 
+    /// <summary>
+    /// Commands queue waitting for request to device
+    /// </summary>
     protected readonly Queue<Command> _PackageQueue = new Queue<Command>();
     /// <summary>
     /// |0          |1                  |2                   |3    n|n+1 n+2|
@@ -180,6 +225,10 @@
     /// </summary>
     protected readonly byte[] _RecvBuffer = new byte[1024];
     protected int _ReadOffset = 0;
+    /// <summary>
+    /// read data from SerialPort received buffer
+    /// </summary>
+    /// <returns></returns>
     protected virtual RecivedState DataReceived() {
       long StartTick = DateTime.Now.Ticks;
       while (!_CTkS.IsCancellationRequested) {
@@ -224,6 +273,47 @@
       return RecivedState.Cancelled;
     }
 
+    protected virtual void OnPackageRecived(in Command Package) {
+      OnRecivedHandler?.Invoke(Package);
+    }
+    /// <summary>
+    /// T1:MainType T2:SubType(if has else 0x00) T3:FullData[0:MainType 1:SubType 2-n:Data],no crc
+    /// </summary>
+    public event Action<Command> OnRecivedHandler;
+    protected enum RecivedState {
+      /// <summary>
+      /// receiving
+      /// </summary>
+      Recving = 0,
+      /// <summary>
+      /// Task Cancelled
+      /// </summary>
+      Cancelled = -4,
+      /// <summary>
+      /// Recev timed out
+      /// </summary>
+      TimedOut = -3,
+      /// <summary>
+      /// this package didnt pass CRC verify
+      /// </summary>
+      CRCFail = -2,
+      /// <summary>
+      /// received a nak package
+      /// </summary>
+      NAK = -1,
+      /// <summary>
+      /// received a ack package
+      /// </summary>
+      ACK = 1,
+      /// <summary>
+      /// received a data package
+      /// </summary>
+      Data = 2,
+    }
+    public void Dispose() {
+
+      try { _SerialPort.Dispose(); } catch { }
+    }
     protected static int Crc16(byte[] arr, in int Offset, in int Length) {
       int i = Offset, tmpCrc = 0;
       byte j;
@@ -241,36 +331,9 @@
       }
       return tmpCrc;
     }
-
-    protected virtual void OnPackageRecived(in Command Package) {
-      OnRecivedHandler?.Invoke(Package);
-    }
-
-    /// <summary>
-    /// T1:MainType T2:SubType(if has else 0x00) T3:FullData[0:MainType 1:SubType 2-n:Data],no crc
-    /// </summary>
-    public event Action<Command> OnRecivedHandler;
-
-    protected enum RecivedState {
-      Recving = 0,
-      Cancelled = -4,
-      TimedOut = -3,
-      CRCFail = -2,
-      NAK = -1,
-      ACK = 1,
-      Data = 2,
-    }
-
-    public void Dispose() {
-
-      try { _SerialPort.Dispose(); } catch { }
-    }
   }
 
   public enum CommandMark : byte {
-    //P_ACK = 0x00,
-    //P_NAK = 0xFF,
-
     Reset = 0x30,
     GetStatus = 0x31,
     SetSecurity = 0x32,
@@ -471,10 +534,22 @@
     WaittingOfDecision = 0x8300 | 0x0100,
   }
   public struct Command {
+    /// <summary>
+    /// full command data,from SYN to CRC
+    /// </summary>
     public byte[] CommandData { get; set; }
+    /// <summary>
+    /// This is reference of readed received buffer,reorgnized by SYN flag,SYN always on Index0,next communicate loop will rewrite this array.
+    /// if need save data,should copy form this array
+    /// </summary>
     public byte[] ResponseData { get; set; }
+    /// <summary>
+    /// how long readed
+    /// </summary>
     public int ResponsDataLength { get; set; }
-    public bool IsACK { get; set; }
+    /// <summary>
+    /// got a ack package responsed from device
+    /// </summary>
     public bool IsACKResponsed { get; set; }
     public CommandMark? CommandMark { get; set; }
     public PollRecivedPackageType? ResponseMark {
@@ -491,7 +566,7 @@
 
   }
 
-  public class CashCounterCfg {
+  public class CashCodeB2BCfg {
     public byte DeviceType { get; set; } = 0x03;
     /// <summary>
     /// default=0b11111111
