@@ -397,6 +397,9 @@
     /// </summary>
     Stacking = 0x1700 | 0x0000,
     Returning = 0x1800 | 0x0000,
+    /// <summary>
+    /// 禁止收币
+    /// </summary>
     Disabled = 0x1900 | 0x0000,
     /// <summary>
     /// 保持
@@ -559,6 +562,17 @@
             return (PollRecivedPackageType)((ResponseData[3] << 8) | 0x0000);
           }
           return (PollRecivedPackageType)(((ResponseData[3] << 8) & 0xFFFF) | (ResponseData[4]) & 0xFFFF);
+        }
+        return null;
+      }
+    }
+    public byte? SubResponseMark {
+      get {
+        if (CommandMark.HasValue && CommandMark.Value == CashCodeProtocol.CommandMark.Poll) {
+          if (ResponseData[2] - 2 == 4) {
+            return null;
+          }
+          return (byte)((ResponseData[4]) & 0xFF);
         }
         return null;
       }
