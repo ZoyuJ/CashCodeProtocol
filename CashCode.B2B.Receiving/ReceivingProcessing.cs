@@ -1,16 +1,15 @@
 ﻿namespace CashCodeProtocol.B2B.Receiving {
   using System;
   using System.Collections.Generic;
-  using System.Linq;
-  using System.Text;
-  using System.Threading.Tasks;
 
 
   using CashCodeProtocol.B2B;
 
+  using CommandNavigation;
+  using CommandNavigation.Command1Navigation2;
+
   using Microsoft.Extensions.Logging;
 
-  using static CashCodeProtocol.B2B.Receiving.ObejctStack;
 
   public class B2BReceivingProcessing : CashCodeB2B {
     public B2BReceivingProcessing(CashCodeB2BCfg Cfg, Dictionary<byte, int> ValueMap, ILogger<CashCodeB2B> Logger) : base(Cfg, Logger) {
@@ -50,29 +49,29 @@
       else return;
       switch (_LastType) {
         case PollRecivedPackageType.Idling:
-          _StepStack.Push(new PollIdling() { Step = 10, PollResponsed = PollRecivedPackageType.Idling, Data = null });
+          _StepStack.Push(new PollIdling() { Order = 10, PollResponsed = PollRecivedPackageType.Idling, Data = null });
           break;
         case PollRecivedPackageType.Accepting:
-          _StepStack.Push(new PollAccepting() { Step = 20, PollResponsed = PollRecivedPackageType.Accepting, Data = null });
+          _StepStack.Push(new PollAccepting() { Order = 20, PollResponsed = PollRecivedPackageType.Accepting, Data = null });
           break;
         case PollRecivedPackageType.Stacking:
           break;
         case PollRecivedPackageType.Returning:
           break;
         case PollRecivedPackageType.Disabled:
-          _StepStack.Push(new PollDisabled() { Step = 40, PollResponsed = PollRecivedPackageType.Disabled, Data = null });
+          _StepStack.Push(new PollDisabled() { Order = 40, PollResponsed = PollRecivedPackageType.Disabled, Data = null });
           break;
         case PollRecivedPackageType.Holding:
           break;
         case PollRecivedPackageType.ESCROW:
           break;
         case PollRecivedPackageType.PackedOrStacked:
-          var St1 = new PollStockedPacked { Step = 30, PollResponsed = PollRecivedPackageType.PackedOrStacked, Data = new byte[Packet.ResponsDataLength] };
+          var St1 = new PollStockedPacked { Order = 30, PollResponsed = PollRecivedPackageType.PackedOrStacked, Data = new byte[Packet.ResponsDataLength] };
           Array.Copy(Packet.ResponseData, 0, St1.Data, 0, Packet.ResponsDataLength);
           _StepStack.Push(St1);
           break;
         case PollRecivedPackageType.Returned:
-          _StepStack.Push(new PollReturned() { Step = 30, PollResponsed = PollRecivedPackageType.Returned, Data = null });
+          _StepStack.Push(new PollReturned() { Order = 30, PollResponsed = PollRecivedPackageType.Returned, Data = null });
           break;
         case PollRecivedPackageType.Busy:
           break;
@@ -93,7 +92,7 @@
         case PollRecivedPackageType.Rejected_Barcode_IncorrectNum:
         case PollRecivedPackageType.Rejected_Barcode_UnknownStart:
         case PollRecivedPackageType.Rejected_Barcode_UnknownStop:
-          _StepStack.Push(new PollRejected() { Step = 30, PollResponsed = _LastType, Data = null });
+          _StepStack.Push(new PollRejected() { Order = 30, PollResponsed = _LastType, Data = null });
           break;
         case PollRecivedPackageType.Dispensing_Recycling2Dispenser:
         case PollRecivedPackageType.Dispensing_WaittingCustomeTake:
@@ -116,12 +115,12 @@
         case PollRecivedPackageType.GenericErrorCode:
         case PollRecivedPackageType.PowerUpWithBillInValidator:
         case PollRecivedPackageType.PowerUpWithBillInChassis:
-          var St2 = new PollError { Step = 0, PollResponsed = _LastType, Data = new byte[Packet.ResponsDataLength] };
+          var St2 = new PollError { Order = 0, PollResponsed = _LastType, Data = new byte[Packet.ResponsDataLength] };
           Array.Copy(Packet.ResponseData, 0, St2.Data, 0, Packet.ResponsDataLength);
           _StepStack.Push(St2);
           break;
         case PollRecivedPackageType.Initialize:
-          _StepStack.Push(new PollInitialize { Step = 0, PollResponsed = PollRecivedPackageType.Initialize, Data = null });
+          _StepStack.Push(new PollInitialize { Order = 0, PollResponsed = PollRecivedPackageType.Initialize, Data = null });
           break;
         case PollRecivedPackageType.WaittingOfDecision:
         case PollRecivedPackageType.PowerUp:
@@ -131,7 +130,7 @@
     }
 
     protected readonly Dictionary<byte, int> _ValueMap;
-    private readonly ObejctStack _StepStack = new ObejctStack(null, null, 10);
+    internal readonly CommandNavigation<IRecevingStep> _StepStack = new CommandNavigation<IRecevingStep>(10);
 
     public int TotalValue { get; protected set; }
 
@@ -180,36 +179,39 @@
 
     internal struct PollInitialize : IRecevingStep {
       public B2BReceivingProcessing Device { get; set; }
-      public int Step { get; set; }
+      public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte[] Data { get; set; }
-      public void OnEvent() { }
-      public void OnEject() { }
+      public void OnPush() { }
+      public void OnPop() { }
+      public CommandState CommandState { get; set; }
     }
     internal struct PollIdling : IRecevingStep {
       public B2BReceivingProcessing Device { get; set; }
-      public int Step { get; set; }
+      public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte[] Data { get; set; }
-      public void OnEvent() => Device.OnIdlingHandler?.Invoke(Device);
-      public void OnEject() { }
+      public void OnPush() => Device.OnIdlingHandler?.Invoke(Device);
+      public void OnPop() { }
+      public CommandState CommandState { get; set; }
     }
     internal struct PollAccepting : IRecevingStep {
       public B2BReceivingProcessing Device { get; set; }
-      public int Step { get; set; }
+      public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte[] Data { get; set; }
-      public void OnEvent() => Device.OnAcceptingHandler?.Invoke(Device);
-      public void OnEject() { }
+      public void OnPush() => Device.OnAcceptingHandler?.Invoke(Device);
+      public void OnPop() { }
+      public CommandState CommandState { get; set; }
     }
     internal struct PollStockedPacked : IRecevingStep {
       public B2BReceivingProcessing Device { get; set; }
-      public int Step { get; set; }
+      public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte? Sub { get => Data[4]; }
       public byte[] Data { get; set; }
-      public void OnEvent() {
-        if (Device._StepStack.Count > 0) {
+      public void OnPush() {
+        if (Device._StepStack.Count>0) {
           var LastStep = Device._StepStack.Peek();
           //向前检查
           if (LastStep.PollResponsed == PollRecivedPackageType.Accepting || LastStep.PollResponsed == PollRecivedPackageType.Stacking) {
@@ -233,104 +235,55 @@
          */
 
       }
-      public void OnEject() { }
+      public void OnPop() { }
+      public CommandState CommandState { get; set; }
     }
     internal struct PollRejected : IRecevingStep {
       public B2BReceivingProcessing Device { get; set; }
-      public int Step { get; set; }
+      public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte[] Data { get; set; }
-      public void OnEvent() => Device.OnRejectHandler?.Invoke(Device);
-      public void OnEject() { }
+      public void OnPush() => Device.OnRejectHandler?.Invoke(Device);
+      public void OnPop() { }
+      public CommandState CommandState { get; set; }
     }
     internal struct PollDisabled : IRecevingStep {
       public B2BReceivingProcessing Device { get; set; }
-      public int Step { get; set; }
+      public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte[] Data { get; set; }
-      public void OnEvent() => Device.OnDisabledHandler?.Invoke(Device);
-      public void OnEject() { }
+      public void OnPush() => Device.OnDisabledHandler?.Invoke(Device);
+      public void OnPop() { }
+      public CommandState CommandState { get; set; }
     }
     internal struct PollReturned : IRecevingStep {
       public B2BReceivingProcessing Device { get; set; }
-      public int Step { get; set; }
+      public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte? Sub { get => Data[4]; }
       public byte[] Data { get; set; }
-      public void OnEvent() => Device.OnReturnedHandler?.Invoke(Device);
-      public void OnEject() { }
+      public void OnPush() => Device.OnReturnedHandler?.Invoke(Device);
+      public void OnPop() { }
+      public CommandState CommandState { get; set; }
     }
     internal struct PollError : IRecevingStep {
       public B2BReceivingProcessing Device { get; set; }
-      public int Step { get; set; }
+      public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte? Sub { get => Data[2] - 2 - 3 - 1 > 0 ? Data[4] : (byte)0x00; }
       public byte[] Data { get; set; }
-      public void OnEvent() => Device.OnErrorCatchedHandler?.Invoke(Device);
-      public void OnEject() { }
+      public void OnPush() => Device.OnErrorCatchedHandler?.Invoke(Device);
+      public void OnPop() { }
+      public CommandState CommandState { get; set; }
     }
-    //internal struct SkipStep : IRecevingStep {
-    //  public B2BReceivingProcessing Device { get; set; }
-    //  public int Step { get; set; }
-    //  public PollRecivedPackageType PollResponsed { get; set; }
-    //  public byte? Sub { get => Data[4]; }
-    //  public byte[] Data { get; set; }
-    //  public void OnEvent() => Device.OnReturnedHandler?.Invoke(Device);
-    //  public void OnEject() { }
-    //}
+ 
   }
-  internal interface IRecevingStep {
+  internal interface IRecevingStep : ICommandCtrl {
     B2BReceivingProcessing Device { get; }
-    int Step { get; }
     PollRecivedPackageType PollResponsed { get; }
     byte[] Data { get; }
-    void OnEvent();
-    void OnEject();
   }
 
-
-  internal sealed class ObejctStack : Stack<IRecevingStep> {
-    public ObejctStack(Action<IRecevingStep> OnPush, Action<IRecevingStep> OnPop) : this(OnPush, OnPop, 512) { }
-    public ObejctStack(Action<IRecevingStep> OnPush, Action<IRecevingStep> OnPop, int Capacity) : base(Capacity) {
-      this.OnPop = OnPop;
-      this.OnPush = OnPush;
-    }
-
-    private readonly Action<IRecevingStep> OnPush;
-    private readonly Action<IRecevingStep> OnPop;
-
-    public new void Push(IRecevingStep Item) {
-      if (Count == 0) {
-        Item.OnEvent();
-        base.Push(Item);
-        OnPush?.Invoke(Item);
-      }
-      else if (Item.Step <= base.Peek().Step) {
-        base.Peek().OnEject();
-        OnPop?.Invoke(base.Pop());
-      }
-      else {
-        Item.OnEvent();
-        base.Push(Item);
-        OnPush?.Invoke(Item);
-      }
-    }
-    public new IRecevingStep Pop() {
-      if (Count > 0) {
-        base.Peek().OnEject();
-        var Item = base.Pop();
-        OnPop?.Invoke(Item);
-        return Item;
-      }
-      return default;
-    }
-    public new void Clear() {
-      while (Count > 0) {
-        this.Pop();
-      }
-    }
-
-  }
 
 
 
