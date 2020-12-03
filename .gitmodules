@@ -1,0 +1,3 @@
+[submodule "CommandNavigation"]
+	path = CommandNavigation
+	url = https://github.com/ZoyuJ/CommandNavigation.git
