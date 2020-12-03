@@ -147,42 +147,42 @@
     /// <summary>
     /// 发生必须人工干预的错误
     /// </summary>
-    public event Action<B2BReceivingProcessing> OnErrorCatchedHandler;
+    public event OnErrorCatchedEventHandler OnErrorCatched;
     /// <summary>
     /// 纸币不被识别
     /// </summary>
-    public event Action<B2BReceivingProcessing> OnRejectHandler;
+    public event OnRejectedEventHandler OnRejected;
     /// <summary>
     /// 正在处理上一张，暂停收币
     /// </summary>
-    public event Action<B2BReceivingProcessing> OnDisabledHandler;
+    public event OnDisabledEventHandler OnDisabled;
     /// <summary>
     /// 纸币被退回
     /// </summary>
-    public event Action<B2BReceivingProcessing> OnReturnedHandler;
+    public event OnReturnedEventHandler OnReturned;
     /// <summary>
     /// 已收币，正在压入钱箱
     /// </summary>
-    public event Action<B2BReceivingProcessing> OnPackedOrStackedHandler;
+    public event OnPackedOrStackedEventHandler OnPackedOrStacked;
     /// <summary>
     /// 已准备好接受下一张
     /// </summary>
-    public event Action<B2BReceivingProcessing> OnIdlingHandler;
+    public event OnIdlingEventHandler OnIdling;
     /// <summary>
     /// 检查到纸币放入
     /// </summary>
-    public event Action<B2BReceivingProcessing> OnAcceptingHandler;
+    public event OnAcceptingEventHandler OnAccepting;
     /// <summary>
     /// 已完成初始化
     /// </summary>
-    public event Action<B2BReceivingProcessing> OnInitializeHandler;
+    public event OnInitializeEventHandler OnInitialize;
 
     internal struct PollInitialize : IRecevingStep {
       public B2BReceivingProcessing Device { get; set; }
       public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte[] Data { get; set; }
-      public void OnPush() { }
+      public void OnPush() { Device.OnInitialize?.Invoke(Device,this); }
       public void OnPop() { }
       public CommandState CommandState { get; set; }
     }
@@ -191,7 +191,7 @@
       public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnIdlingHandler?.Invoke(Device);
+      public void OnPush() => Device.OnIdling?.Invoke(Device,this);
       public void OnPop() { }
       public CommandState CommandState { get; set; }
     }
@@ -200,7 +200,7 @@
       public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnAcceptingHandler?.Invoke(Device);
+      public void OnPush() => Device.OnAccepting?.Invoke(Device,this);
       public void OnPop() { }
       public CommandState CommandState { get; set; }
     }
@@ -211,7 +211,7 @@
       public byte? Sub { get => Data[4]; }
       public byte[] Data { get; set; }
       public void OnPush() {
-        if (Device._StepStack.Count>0) {
+        if (Device._StepStack.Count > 0) {
           var LastStep = Device._StepStack.Peek();
           //向前检查
           if (LastStep.PollResponsed == PollRecivedPackageType.Accepting || LastStep.PollResponsed == PollRecivedPackageType.Stacking) {
@@ -223,7 +223,7 @@
               //TODO No BillType Or Type Not in Map
             }
 
-            Device.OnPackedOrStackedHandler?.Invoke(Device);
+            Device.OnPackedOrStacked?.Invoke(Device,this);
             return;
           }
         }
@@ -243,7 +243,7 @@
       public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnRejectHandler?.Invoke(Device);
+      public void OnPush() => Device.OnRejected?.Invoke(Device,this);
       public void OnPop() { }
       public CommandState CommandState { get; set; }
     }
@@ -252,7 +252,7 @@
       public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnDisabledHandler?.Invoke(Device);
+      public void OnPush() => Device.OnDisabled?.Invoke(Device,this);
       public void OnPop() { }
       public CommandState CommandState { get; set; }
     }
@@ -262,7 +262,7 @@
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte? Sub { get => Data[4]; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnReturnedHandler?.Invoke(Device);
+      public void OnPush() => Device.OnReturned?.Invoke(Device,this);
       public void OnPop() { }
       public CommandState CommandState { get; set; }
     }
@@ -272,19 +272,26 @@
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte? Sub { get => Data[2] - 2 - 3 - 1 > 0 ? Data[4] : (byte)0x00; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnErrorCatchedHandler?.Invoke(Device);
+      public void OnPush() => Device.OnErrorCatched?.Invoke(Device,this);
       public void OnPop() { }
       public CommandState CommandState { get; set; }
     }
- 
+
   }
-  internal interface IRecevingStep : ICommandCtrl {
+  public interface IRecevingStep : ICommandCtrl {
     B2BReceivingProcessing Device { get; }
     PollRecivedPackageType PollResponsed { get; }
     byte[] Data { get; }
   }
 
 
-
+  public delegate void OnInitializeEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
+  public delegate void OnAcceptingEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
+  public delegate void OnIdlingEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
+  public delegate void OnPackedOrStackedEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
+  public delegate void OnReturnedEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
+  public delegate void OnDisabledEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
+  public delegate void OnRejectedEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
+  public delegate void OnErrorCatchedEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
 
 }
