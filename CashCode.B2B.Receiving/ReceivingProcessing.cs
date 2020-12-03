@@ -284,7 +284,6 @@
     byte[] Data { get; }
   }
 
-
   public delegate void OnInitializeEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
   public delegate void OnAcceptingEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
   public delegate void OnIdlingEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
