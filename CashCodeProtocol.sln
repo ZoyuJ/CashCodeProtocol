@@ -7,16 +7,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CashCode.B2B", "CashCode.B2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CashCode.B2B.Receiving", "CashCode.B2B.Receiving\CashCode.B2B.Receiving.csproj", "{035A866A-47F3-4AB2-90D3-C2F5BD98FF06}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Try", "Try\Try.csproj", "{0CB12886-0645-4AFC-A6BA-8A6A39BDAD8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Try", "Try\Try.csproj", "{0CB12886-0645-4AFC-A6BA-8A6A39BDAD8E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CashCodeCore.B2B", "CashCodeCore.B2B\CashCodeCore.B2B.csproj", "{60351D42-F117-497B-8596-C9728B45196C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CashCodeCore.B2B", "CashCodeCore.B2B\CashCodeCore.B2B.csproj", "{60351D42-F117-497B-8596-C9728B45196C}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CashCodeCommon", "CashCodeCommon\CashCodeCommon.shproj", "{07111757-1887-4CEB-AFC8-14085E48C9F9}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		CashCodeCommon\CashCodeCommon.projitems*{07111757-1887-4ceb-afc8-14085e48c9f9}*SharedItemsImports = 13
-		CashCodeCommon\CashCodeCommon.projitems*{60351d42-f117-497b-8596-c9728b45196c}*SharedItemsImports = 5
 		CashCodeCommon\CashCodeCommon.projitems*{62e1bade-35ae-4632-975e-ea2969907c46}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

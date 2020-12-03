@@ -7,8 +7,8 @@
     <ProjectGuid>{035A866A-47F3-4AB2-90D3-C2F5BD98FF06}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CashCode.B2B.Receiving</RootNamespace>
-    <AssemblyName>CashCode.B2B.Receiving</AssemblyName>
+    <RootNamespace>CashCodeProtocol.B2B.Receiving</RootNamespace>
+    <AssemblyName>CashCodeProtocol.B2B.Receiving</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -48,13 +48,13 @@
     <Compile Include="ReceivingProcessing.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\CashCode.B2B\CashCode.B2B.csproj">
       <Project>{62e1bade-35ae-4632-975e-ea2969907c46}</Project>
       <Name>CashCode.B2B</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

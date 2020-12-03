@@ -1,4 +1,4 @@
-﻿namespace CashCodeProtocol {
+﻿namespace CashCodeProtocol.B2B {
   using System;
   using System.Collections.Generic;
   using System.Diagnostics;
@@ -557,7 +557,7 @@
     public CommandMark? CommandMark { get; set; }
     public PollRecivedPackageType? ResponseMark {
       get {
-        if (CommandMark.HasValue && CommandMark.Value == CashCodeProtocol.CommandMark.Poll) {
+        if (CommandMark.HasValue && CommandMark.Value == CashCodeProtocol.B2B.CommandMark.Poll) {
           if (ResponseData[2] - 2 == 4) {
             return (PollRecivedPackageType)((ResponseData[3] << 8) | 0x0000);
           }
@@ -568,7 +568,7 @@
     }
     public byte? SubResponseMark {
       get {
-        if (CommandMark.HasValue && CommandMark.Value == CashCodeProtocol.CommandMark.Poll) {
+        if (CommandMark.HasValue && CommandMark.Value == CashCodeProtocol.B2B.CommandMark.Poll) {
           if (ResponseData[2] - 2 == 4) {
             return null;
           }

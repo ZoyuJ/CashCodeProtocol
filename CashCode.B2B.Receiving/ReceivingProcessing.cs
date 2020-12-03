@@ -1,15 +1,16 @@
-﻿namespace CashCode.B2B.Receiving {
+﻿namespace CashCodeProtocol.B2B.Receiving {
   using System;
   using System.Collections.Generic;
   using System.Linq;
   using System.Text;
   using System.Threading.Tasks;
 
-  using CashCodeProtocol;
+
+  using CashCodeProtocol.B2B;
 
   using Microsoft.Extensions.Logging;
 
-  using static CashCode.B2B.Receiving.ObejctStack;
+  using static CashCodeProtocol.B2B.Receiving.ObejctStack;
 
   public class B2BReceivingProcessing : CashCodeB2B {
     public B2BReceivingProcessing(CashCodeB2BCfg Cfg, Dictionary<byte, int> ValueMap, ILogger<CashCodeB2B> Logger) : base(Cfg, Logger) {
