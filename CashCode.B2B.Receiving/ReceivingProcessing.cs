@@ -1,7 +1,8 @@
 ﻿namespace CashCodeProtocol.B2B.Receiving {
   using System;
+  using System.Collections;
   using System.Collections.Generic;
-
+  using System.Diagnostics;
 
   using CashCodeProtocol.B2B;
 
@@ -11,7 +12,7 @@
   using Microsoft.Extensions.Logging;
 
 
-  public class B2BReceivingProcessing : CashCodeB2B {
+  public class B2BReceivingProcessing : CashCodeB2B, IEnumerable<int> {
     public B2BReceivingProcessing(CashCodeB2BCfg Cfg, Dictionary<byte, int> ValueMap, ILogger<CashCodeB2B> Logger) : base(Cfg, Logger) {
       _ValueMap = ValueMap;
       this.OnRecivedHandler += Device_OnRecivedHandler;
@@ -133,7 +134,8 @@
     internal readonly CommandNavigation<IRecevingStep> _StepStack = new CommandNavigation<IRecevingStep>(10);
 
     public int TotalValue { get; protected set; }
-
+    public int Count { get => _ReceivedCash.Count; }
+    protected readonly Stack<int> _ReceivedCash;
     /// <summary>
     /// 禁止放入纸币
     /// </summary>
@@ -182,7 +184,7 @@
       public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte[] Data { get; set; }
-      public void OnPush() { Device.OnInitialize?.Invoke(Device,this); }
+      public void OnPush() { Device.OnInitialize?.Invoke(Device, this); }
       public void OnPop() { }
       public CommandState CommandState { get; set; }
     }
@@ -191,7 +193,7 @@
       public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnIdling?.Invoke(Device,this);
+      public void OnPush() => Device.OnIdling?.Invoke(Device, this);
       public void OnPop() { }
       public CommandState CommandState { get; set; }
     }
@@ -200,7 +202,7 @@
       public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnAccepting?.Invoke(Device,this);
+      public void OnPush() => Device.OnAccepting?.Invoke(Device, this);
       public void OnPop() { }
       public CommandState CommandState { get; set; }
     }
@@ -218,12 +220,14 @@
 
             if (Sub.HasValue && Device._ValueMap.TryGetValue(Sub.Value, out var Val)) {
               Device.TotalValue += Val;
+              Device._ReceivedCash.Push(Val);
             }
             else {
+              Debug.WriteLine("Unknown Cash Value Type");
               //TODO No BillType Or Type Not in Map
             }
 
-            Device.OnPackedOrStacked?.Invoke(Device,this);
+            Device.OnPackedOrStacked?.Invoke(Device, this);
             return;
           }
         }
@@ -243,7 +247,7 @@
       public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnRejected?.Invoke(Device,this);
+      public void OnPush() => Device.OnRejected?.Invoke(Device, this);
       public void OnPop() { }
       public CommandState CommandState { get; set; }
     }
@@ -252,7 +256,7 @@
       public int Order { get; set; }
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnDisabled?.Invoke(Device,this);
+      public void OnPush() => Device.OnDisabled?.Invoke(Device, this);
       public void OnPop() { }
       public CommandState CommandState { get; set; }
     }
@@ -262,7 +266,7 @@
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte? Sub { get => Data[4]; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnReturned?.Invoke(Device,this);
+      public void OnPush() => Device.OnReturned?.Invoke(Device, this);
       public void OnPop() { }
       public CommandState CommandState { get; set; }
     }
@@ -272,9 +276,16 @@
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte? Sub { get => Data[2] - 2 - 3 - 1 > 0 ? Data[4] : (byte)0x00; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnErrorCatched?.Invoke(Device,this);
+      public void OnPush() => Device.OnErrorCatched?.Invoke(Device, this);
       public void OnPop() { }
       public CommandState CommandState { get; set; }
+    }
+
+    public IEnumerator<int> GetEnumerator() {
+      return _ReceivedCash.GetEnumerator();
+    }
+    IEnumerator IEnumerable.GetEnumerator() {
+      return _ReceivedCash.GetEnumerator();
     }
 
   }
