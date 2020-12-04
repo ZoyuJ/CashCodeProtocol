@@ -47,7 +47,6 @@
 
     private PollRecivedPackageType _LastType;
     private void Device_OnRecivedHandler(Command Packet) {
-      Console.WriteLine($"{Enum.GetName(typeof(PollRecivedPackageType), _LastType)} || {(int)_LastType} || {Packet.SubResponseMark}");
       if (Packet.ResponseMark.HasValue && _LastType != Packet.ResponseMark.Value) {
         _LastType = Packet.ResponseMark.Value;
       }
@@ -206,10 +205,10 @@
         Device.OnInitialize?.Invoke(Device, this);
       }
       public void OnPop() { }
-      public CommandState CommandState { get; set; }
+
 
       public override string ToString() {
-        return $"Initialize,Order{Order},On{CommandState},ResponsedType{PollResponsed},Data{BitConverter.ToString(Data ?? new byte[0])}";
+        return $"Initialize,Order{Order},ResponsedType{PollResponsed},Data{BitConverter.ToString(Data ?? new byte[0])}";
       }
     }
     internal struct PollIdling : IRecevingStep {
@@ -219,10 +218,10 @@
       public byte[] Data { get; set; }
       public void OnPush() => Device.OnIdling?.Invoke(Device, this);
       public void OnPop() { }
-      public CommandState CommandState { get; set; }
+
 
       public override string ToString() {
-        return $"Idling,Order{Order},On{CommandState},ResponsedType{PollResponsed},Data{BitConverter.ToString(Data ?? new byte[0])}";
+        return $"Idling,Order{Order},ResponsedType{PollResponsed},Data{BitConverter.ToString(Data ?? new byte[0])}";
       }
     }
     internal struct PollAccepting : IRecevingStep {
@@ -232,10 +231,10 @@
       public byte[] Data { get; set; }
       public void OnPush() => Device.OnAccepting?.Invoke(Device, this);
       public void OnPop() { }
-      public CommandState CommandState { get; set; }
+
 
       public override string ToString() {
-        return $"Accepting,Order{Order},On{CommandState},ResponsedType{PollResponsed},Data{BitConverter.ToString(Data ?? new byte[0])}";
+        return $"Accepting,Order{Order},ResponsedType{PollResponsed},Data{BitConverter.ToString(Data ?? new byte[0])}";
       }
     }
     internal struct PollESCROW : IRecevingStep {
@@ -246,10 +245,10 @@
       public byte[] Data { get; set; }
       public void OnPush() => Device.OnESCROW?.Invoke(Device, this);
       public void OnPop() { }
-      public CommandState CommandState { get; set; }
+
 
       public override string ToString() {
-        return $"Accepting,Order{Order},On{CommandState},ResponsedType{PollResponsed},SubData{Sub},Data{BitConverter.ToString(Data ?? new byte[0])}";
+        return $"Accepting,Order{Order},ResponsedType{PollResponsed},SubData{Sub},Data{BitConverter.ToString(Data ?? new byte[0])}";
       }
     }
     internal struct PollStacking : IRecevingStep {
@@ -259,10 +258,10 @@
       public byte[] Data { get; set; }
       public void OnPush() => Device.OnStacking?.Invoke(Device, this);
       public void OnPop() { }
-      public CommandState CommandState { get; set; }
+
 
       public override string ToString() {
-        return $"Stacking,Order{Order},On{CommandState},ResponsedType{PollResponsed},Data{BitConverter.ToString(Data ?? new byte[0])}";
+        return $"Stacking,Order{Order},ResponsedType{PollResponsed},Data{BitConverter.ToString(Data ?? new byte[0])}";
       }
     }
     internal struct PollStockedPacked : IRecevingStep {
@@ -274,16 +273,9 @@
       public void OnPush() {
         if (Device._StepStack.Count > 0) {
           var LastStep = Device._StepStack.Peek();
-          Console.WriteLine("\t StartStackCheck");
-          foreach (var item in Device._StepStack) {
-            Console.WriteLine("\t\t"+item.ToString());
-          }
-          Console.WriteLine("\t E n dStackCheck");
           //向前检查
           if (LastStep.PollResponsed == PollRecivedPackageType.Accepting || LastStep.PollResponsed == PollRecivedPackageType.Stacking) {
-            Console.WriteLine("\t Pass FrontCheck");
             if (Sub.HasValue) {
-              Console.WriteLine("\t Pass HasValueCheck");
               var Val = BillTypes_CNY[Sub.Value];
               Device.TotalValue += Val;
               Device._ReceivedCash.Push(Val);
@@ -292,7 +284,6 @@
               Debug.WriteLine("Unknown Cash Value Type");
               //TODO No BillType Or Type Not in Map
             }
-            Console.WriteLine("\t Pass StartEvent");
             Device.OnPackedOrStacked?.Invoke(Device, this);
             return;
           }
@@ -306,10 +297,9 @@
 
       }
       public void OnPop() { }
-      public CommandState CommandState { get; set; }
 
       public override string ToString() {
-        return $"StockedPacked,Order{Order},On{CommandState},ResponsedType{PollResponsed},SubData{Sub},Data{BitConverter.ToString(Data ?? new byte[0])}";
+        return $"StockedPacked,Order{Order},ResponsedType{PollResponsed},SubData{Sub},Data{BitConverter.ToString(Data ?? new byte[0])}";
       }
     }
     internal struct PollRejected : IRecevingStep {
@@ -319,10 +309,9 @@
       public byte[] Data { get; set; }
       public void OnPush() => Device.OnRejected?.Invoke(Device, this);
       public void OnPop() { }
-      public CommandState CommandState { get; set; }
 
       public override string ToString() {
-        return $"Rejected,Order{Order},On{CommandState},ResponsedType{PollResponsed},Data{BitConverter.ToString(Data ?? new byte[0])}";
+        return $"Rejected,Order{Order},ResponsedType{PollResponsed},Data{BitConverter.ToString(Data ?? new byte[0])}";
       }
     }
     internal struct PollDisabled : IRecevingStep {
@@ -332,10 +321,10 @@
       public byte[] Data { get; set; }
       public void OnPush() => Device.OnDisabled?.Invoke(Device, this);
       public void OnPop() { }
-      public CommandState CommandState { get; set; }
+
 
       public override string ToString() {
-        return $"Disabled,Order{Order},On{CommandState},ResponsedType{PollResponsed},Data{BitConverter.ToString(Data ?? new byte[0])}";
+        return $"Disabled,Order{Order},ResponsedType{PollResponsed},Data{BitConverter.ToString(Data ?? new byte[0])}";
       }
     }
     internal struct PollReturned : IRecevingStep {
@@ -346,10 +335,10 @@
       public byte[] Data { get; set; }
       public void OnPush() => Device.OnReturned?.Invoke(Device, this);
       public void OnPop() { Device.TotalValue -= Device._ReceivedCash.Pop(); }
-      public CommandState CommandState { get; set; }
+
 
       public override string ToString() {
-        return $"Returned,Order{Order},On{CommandState},ResponsedType{PollResponsed},SubData{Sub},Data{BitConverter.ToString(Data ?? new byte[0])}";
+        return $"Returned,Order{Order},ResponsedType{PollResponsed},SubData{Sub},Data{BitConverter.ToString(Data ?? new byte[0])}";
       }
     }
     internal struct PollReturnning : IRecevingStep {
@@ -360,10 +349,10 @@
       public byte[] Data { get; set; }
       public void OnPush() => Device.OnReturning?.Invoke(Device, this);
       public void OnPop() { }
-      public CommandState CommandState { get; set; }
+
 
       public override string ToString() {
-        return $"Returned,Order{Order},On{CommandState},ResponsedType{PollResponsed},SubData{Sub},Data{BitConverter.ToString(Data ?? new byte[0])}";
+        return $"Returned,Order{Order},ResponsedType{PollResponsed},SubData{Sub},Data{BitConverter.ToString(Data ?? new byte[0])}";
       }
     }
     internal struct PollError : IRecevingStep {
@@ -374,10 +363,10 @@
       public byte[] Data { get; set; }
       public void OnPush() => Device.OnErrorCatched?.Invoke(Device, this);
       public void OnPop() { }
-      public CommandState CommandState { get; set; }
+
 
       public override string ToString() {
-        return $"Error,Order{Order},On{CommandState},ResponsedType{PollResponsed},SubData{Sub},Data{BitConverter.ToString(Data ?? new byte[0])}";
+        return $"Error,Order{Order},ResponsedType{PollResponsed},SubData{Sub},Data{BitConverter.ToString(Data ?? new byte[0])}";
       }
     }
 
