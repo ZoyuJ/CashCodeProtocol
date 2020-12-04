@@ -55,9 +55,9 @@
       <Project>{62e1bade-35ae-4632-975e-ea2969907c46}</Project>
       <Name>CashCode.B2B</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CommandNavigation\CommandNavigationx2\CommandNavigationx2.csproj">
-      <Project>{3bbcc2f3-2aa3-4328-b54d-498437a8661d}</Project>
-      <Name>CommandNavigationx2</Name>
+    <ProjectReference Include="..\CommandNavigation\CommandNavigation\CommandNavigation.csproj">
+      <Project>{3250f0fa-f082-4cc3-b01d-45d70d71f24c}</Project>
+      <Name>CommandNavigation</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -15,16 +15,13 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CashCodeCommon", "CashCodeC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CommandNavigation", "CommandNavigation", "{E01D1109-78EF-4BF1-8DD8-E05B5938DCDA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandNavigationx2", "CommandNavigation\CommandNavigationx2\CommandNavigationx2.csproj", "{3BBCC2F3-2AA3-4328-B54D-498437A8661D}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CommandNavigationCommon", "CommandNavigation\CommandNavigationCommon\CommandNavigationCommon.shproj", "{F4C9334D-B53C-4362-BB8D-C5C6A1997897}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandNavigation", "CommandNavigation\CommandNavigation\CommandNavigation.csproj", "{3250F0FA-F082-4CC3-B01D-45D70D71F24C}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		CashCodeCommon\CashCodeCommon.projitems*{07111757-1887-4ceb-afc8-14085e48c9f9}*SharedItemsImports = 13
-		CommandNavigation\CommandNavigationCommon\CommandNavigationCommon.projitems*{3bbcc2f3-2aa3-4328-b54d-498437a8661d}*SharedItemsImports = 4
+		CommandNavigation\CommandNavigationCommon\CommandNavigationCommon.projitems*{3250f0fa-f082-4cc3-b01d-45d70d71f24c}*SharedItemsImports = 4
 		CashCodeCommon\CashCodeCommon.projitems*{62e1bade-35ae-4632-975e-ea2969907c46}*SharedItemsImports = 4
-		CommandNavigation\CommandNavigationCommon\CommandNavigationCommon.projitems*{f4c9334d-b53c-4362-bb8d-c5c6a1997897}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,17 +44,16 @@ Global
 		{60351D42-F117-497B-8596-C9728B45196C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60351D42-F117-497B-8596-C9728B45196C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60351D42-F117-497B-8596-C9728B45196C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3BBCC2F3-2AA3-4328-B54D-498437A8661D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3BBCC2F3-2AA3-4328-B54D-498437A8661D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3BBCC2F3-2AA3-4328-B54D-498437A8661D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3BBCC2F3-2AA3-4328-B54D-498437A8661D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3250F0FA-F082-4CC3-B01D-45D70D71F24C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3250F0FA-F082-4CC3-B01D-45D70D71F24C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3250F0FA-F082-4CC3-B01D-45D70D71F24C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3250F0FA-F082-4CC3-B01D-45D70D71F24C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{3BBCC2F3-2AA3-4328-B54D-498437A8661D} = {E01D1109-78EF-4BF1-8DD8-E05B5938DCDA}
-		{F4C9334D-B53C-4362-BB8D-C5C6A1997897} = {E01D1109-78EF-4BF1-8DD8-E05B5938DCDA}
+		{3250F0FA-F082-4CC3-B01D-45D70D71F24C} = {E01D1109-78EF-4BF1-8DD8-E05B5938DCDA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C455D15-ED0C-424D-AD36-1A2E1D03C871}

@@ -12,7 +12,7 @@
           new CashCodeProtocol.B2B.CashCodeB2BCfg { DecicePort = "COM4" }, null);
       B2BProc.Connect();
       B2BProc.StartPollingLoop();
-      B2BProc.OnPackedOrStacked += (D, d) => { Console.WriteLine($"TV:{D.TotalValue}"); Console.WriteLine($"TP:{D.Count}"); };
+      B2BProc.OnPackedOrStacked += (D, d, sd) => { Console.WriteLine($"TV:{D.TotalValue}"); Console.WriteLine($"TP:{D.Count}"); };
       while (true) {
         var K = Console.ReadKey().Key;
         if (K == ConsoleKey.Q) {
