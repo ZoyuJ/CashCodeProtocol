@@ -50,29 +50,29 @@
       else return;
       switch (_LastType) {
         case PollRecivedPackageType.Idling:
-          _StepStack.Push(new PollIdling() { Order = 10, PollResponsed = PollRecivedPackageType.Idling, Data = null });
+          _StepStack.Push(new PollIdling() {Device = this, Order = 10, PollResponsed = PollRecivedPackageType.Idling, Data = null });
           break;
         case PollRecivedPackageType.Accepting:
-          _StepStack.Push(new PollAccepting() { Order = 20, PollResponsed = PollRecivedPackageType.Accepting, Data = null });
+          _StepStack.Push(new PollAccepting() { Device = this, Order = 20, PollResponsed = PollRecivedPackageType.Accepting, Data = null });
           break;
         case PollRecivedPackageType.Stacking:
           break;
         case PollRecivedPackageType.Returning:
           break;
         case PollRecivedPackageType.Disabled:
-          _StepStack.Push(new PollDisabled() { Order = 40, PollResponsed = PollRecivedPackageType.Disabled, Data = null });
+          _StepStack.Push(new PollDisabled() { Device = this, Order = 40, PollResponsed = PollRecivedPackageType.Disabled, Data = null });
           break;
         case PollRecivedPackageType.Holding:
           break;
         case PollRecivedPackageType.ESCROW:
           break;
         case PollRecivedPackageType.PackedOrStacked:
-          var St1 = new PollStockedPacked { Order = 30, PollResponsed = PollRecivedPackageType.PackedOrStacked, Data = new byte[Packet.ResponsDataLength] };
+          var St1 = new PollStockedPacked { Device = this, Order = 30, PollResponsed = PollRecivedPackageType.PackedOrStacked, Data = new byte[Packet.ResponsDataLength] };
           Array.Copy(Packet.ResponseData, 0, St1.Data, 0, Packet.ResponsDataLength);
           _StepStack.Push(St1);
           break;
         case PollRecivedPackageType.Returned:
-          _StepStack.Push(new PollReturned() { Order = 30, PollResponsed = PollRecivedPackageType.Returned, Data = null });
+          _StepStack.Push(new PollReturned() { Device = this, Order = 30, PollResponsed = PollRecivedPackageType.Returned, Data = null });
           break;
         case PollRecivedPackageType.Busy:
           break;
@@ -93,7 +93,7 @@
         case PollRecivedPackageType.Rejected_Barcode_IncorrectNum:
         case PollRecivedPackageType.Rejected_Barcode_UnknownStart:
         case PollRecivedPackageType.Rejected_Barcode_UnknownStop:
-          _StepStack.Push(new PollRejected() { Order = 30, PollResponsed = _LastType, Data = null });
+          _StepStack.Push(new PollRejected() { Device = this, Order = 30, PollResponsed = _LastType, Data = null });
           break;
         case PollRecivedPackageType.Dispensing_Recycling2Dispenser:
         case PollRecivedPackageType.Dispensing_WaittingCustomeTake:
@@ -116,12 +116,12 @@
         case PollRecivedPackageType.GenericErrorCode:
         case PollRecivedPackageType.PowerUpWithBillInValidator:
         case PollRecivedPackageType.PowerUpWithBillInChassis:
-          var St2 = new PollError { Order = 0, PollResponsed = _LastType, Data = new byte[Packet.ResponsDataLength] };
+          var St2 = new PollError { Device = this, Order = 0, PollResponsed = _LastType, Data = new byte[Packet.ResponsDataLength] };
           Array.Copy(Packet.ResponseData, 0, St2.Data, 0, Packet.ResponsDataLength);
           _StepStack.Push(St2);
           break;
         case PollRecivedPackageType.Initialize:
-          _StepStack.Push(new PollInitialize { Order = 0, PollResponsed = PollRecivedPackageType.Initialize, Data = null });
+          _StepStack.Push(new PollInitialize { Device = this, Order = 0, PollResponsed = PollRecivedPackageType.Initialize, Data = null });
           break;
         case PollRecivedPackageType.WaittingOfDecision:
         case PollRecivedPackageType.PowerUp:
