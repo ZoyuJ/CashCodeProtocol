@@ -109,7 +109,7 @@
     /// <returns></returns>
     public virtual async Task StartPollingLoop() {
       SendReset();
-      SendEnableBillTypes(_Cfg.EnableCashType, _Cfg.EnableCashType);
+      SendEnableBillTypes(_Cfg.EnableCashType, _Cfg.EnableEscrowType);
       SendPoll();
       while (!_CTkS.IsCancellationRequested) {
         if (_PackageQueue.Count > 0) {

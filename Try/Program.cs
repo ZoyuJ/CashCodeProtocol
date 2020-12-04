@@ -9,12 +9,10 @@
       Console.WriteLine("Hello World!");
 
       B2BReceivingProcessing B2BProc = new B2BReceivingProcessing(
-          new CashCodeProtocol.B2B.CashCodeB2BCfg { DecicePort = "COM4" }, null, null);
+          new CashCodeProtocol.B2B.CashCodeB2BCfg { DecicePort = "COM4" }, null);
       B2BProc.Connect();
       B2BProc.StartPollingLoop();
-      //Task.Run(() => {
-
-      //});
+      B2BProc.OnPackedOrStacked += (D, d) => { Console.WriteLine($"TV:{D.TotalValue}"); Console.WriteLine($"TP:{D.Count}"); };
       while (true) {
         var K = Console.ReadKey().Key;
         if (K == ConsoleKey.Q) {
