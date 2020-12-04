@@ -17,14 +17,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CommandNavigation", "Comman
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandNavigationx2", "CommandNavigation\CommandNavigationx2\CommandNavigationx2.csproj", "{3BBCC2F3-2AA3-4328-B54D-498437A8661D}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CommandNavigationCommon", "CommandNavigation\CommandNavigationCommon\CommandNavigationCommon.shproj", "{5F250018-2625-45B1-BCB5-3A26518FBB16}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CommandNavigationCommon", "CommandNavigation\CommandNavigationCommon\CommandNavigationCommon.shproj", "{F4C9334D-B53C-4362-BB8D-C5C6A1997897}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		CashCodeCommon\CashCodeCommon.projitems*{07111757-1887-4ceb-afc8-14085e48c9f9}*SharedItemsImports = 13
 		CommandNavigation\CommandNavigationCommon\CommandNavigationCommon.projitems*{3bbcc2f3-2aa3-4328-b54d-498437a8661d}*SharedItemsImports = 4
-		CommandNavigation\CommandNavigationCommon\CommandNavigationCommon.projitems*{5f250018-2625-45b1-bcb5-3a26518fbb16}*SharedItemsImports = 13
 		CashCodeCommon\CashCodeCommon.projitems*{62e1bade-35ae-4632-975e-ea2969907c46}*SharedItemsImports = 4
+		CommandNavigation\CommandNavigationCommon\CommandNavigationCommon.projitems*{f4c9334d-b53c-4362-bb8d-c5c6a1997897}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,7 +57,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3BBCC2F3-2AA3-4328-B54D-498437A8661D} = {E01D1109-78EF-4BF1-8DD8-E05B5938DCDA}
-		{5F250018-2625-45B1-BCB5-3A26518FBB16} = {E01D1109-78EF-4BF1-8DD8-E05B5938DCDA}
+		{F4C9334D-B53C-4362-BB8D-C5C6A1997897} = {E01D1109-78EF-4BF1-8DD8-E05B5938DCDA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C455D15-ED0C-424D-AD36-1A2E1D03C871}

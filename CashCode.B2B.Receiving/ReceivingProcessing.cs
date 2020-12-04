@@ -3,6 +3,7 @@
   using System.Collections;
   using System.Collections.Generic;
   using System.Diagnostics;
+  using System.Text;
 
   using CashCodeProtocol.B2B;
 
@@ -46,6 +47,15 @@
      */
 
     private PollRecivedPackageType _LastType;
+    private StringBuilder ExportCurrentStepStack() {
+      StringBuilder SB = new StringBuilder("\tStart Step Stack\n");
+      foreach (var item in _StepStack) {
+        SB.Append("\t\t");
+        SB.AppendLine(item.ToString());
+      }
+      SB.Append("\t\tE n d Step Stack");
+      return SB;
+    }
     private void Device_OnRecivedHandler(Command Packet) {
       if (Packet.ResponseMark.HasValue && _LastType != Packet.ResponseMark.Value) {
         _LastType = Packet.ResponseMark.Value;
@@ -68,6 +78,7 @@
           var St2 = new PollError { Device = this, Order = 0, PollResponsed = _LastType, Data = new byte[Packet.ResponsDataLength] };
           Array.Copy(Packet.ResponseData, 0, St2.Data, 0, Packet.ResponsDataLength);
           _StepStack.Push(St2);
+          _Logger?.LogError(ExportCurrentStepStack().ToString());
           break;
         #endregion
         case PollRecivedPackageType.Initialize:
