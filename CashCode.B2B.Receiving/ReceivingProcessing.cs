@@ -135,7 +135,7 @@
 
     public int TotalValue { get; protected set; }
     public int Count { get => _ReceivedCash.Count; }
-    protected readonly Stack<int> _ReceivedCash;
+    protected readonly Stack<int> _ReceivedCash = new Stack<int>();
     /// <summary>
     /// 禁止放入纸币
     /// </summary>
