@@ -11,7 +11,7 @@
   using Microsoft.Extensions.Logging;
 
   public class CashCodeB2B : IDisposable {
-
+    
 
     /*
      ◆NO RESPONSE
@@ -109,7 +109,7 @@
     /// <returns></returns>
     public virtual async Task StartPollingLoop() {
       SendReset();
-      SendEnableBillTypes(_Cfg.EnableCashType);
+      SendEnableBillTypes(_Cfg.EnableCashType, _Cfg.EnableCashType);
       SendPoll();
       while (!_CTkS.IsCancellationRequested) {
         if (_PackageQueue.Count > 0) {
@@ -160,14 +160,17 @@
     /// </summary>
     protected static readonly byte[] EMPTYDATAARRAY = new byte[0];
 
-    public void SendStack() => EnqueuePacket(GeneratPackage(CommandMark.Stack, EMPTYDATAARRAY));
     public void SendReset() => EnqueuePacket(GeneratPackage(CommandMark.Reset, EMPTYDATAARRAY));
-    public void SendEnableBillTypes(byte value) => EnqueuePacket(GeneratPackage(CommandMark.EnableBillTypes, new byte[] { 0, 0, value, 0, 0, 0 }));
+    public void SendEnableBillTypes(byte BillTypes, byte EscrowTypes) => EnqueuePacket(GeneratPackage(CommandMark.EnableBillTypes, new byte[] { 0, 0, BillTypes, 0, 0, EscrowTypes }));
 
+    public void SendStack() => EnqueuePacket(GeneratPackage(CommandMark.Stack, EMPTYDATAARRAY));
     public void SendReturn() => EnqueuePacket(GeneratPackage(CommandMark.Return, EMPTYDATAARRAY));
+
     public void SendPoll() => EnqueuePacket(GeneratPackage(CommandMark.Poll, EMPTYDATAARRAY));
+
     public void SendIdentification() => EnqueuePacket(GeneratPackage(CommandMark.Identification, EMPTYDATAARRAY));
     public void SendStatus() => EnqueuePacket(GeneratPackage(CommandMark.GetStatus, EMPTYDATAARRAY));
+
     public void SendSecurity(byte value) => EnqueuePacket(GeneratPackage(CommandMark.SetSecurity, EMPTYDATAARRAY));
 
     /// <summary>
@@ -274,12 +277,12 @@
     }
 
     protected virtual void OnPackageRecived(in Command Package) {
-      OnRecivedHandler?.Invoke(Package);
+      OnReceived?.Invoke(Package);
     }
     /// <summary>
     /// T1:MainType T2:SubType(if has else 0x00) T3:FullData[0:MainType 1:SubType 2-n:Data],no crc
     /// </summary>
-    public event Action<Command> OnRecivedHandler;
+    public event Action<Command> OnReceived;
     protected enum RecivedState {
       /// <summary>
       /// receiving
@@ -409,11 +412,11 @@
 
 
     /// <summary>
-    /// 不识别
+    /// 不识别，插入方向
     /// </summary>
     Rejected_Insertion = 0x1C00 | 0x0060,
     /// <summary>
-    /// 不识别
+    /// 不识别，磁性防伪
     /// </summary>
     Rejected_Magnetic = 0x1C00 | 0x0061,
     /// <summary>
@@ -421,7 +424,7 @@
     /// </summary>
     Rejected_Bill = 0x1C00 | 0x0062,
     /// <summary>
-    /// 不识别
+    /// 不识别，多张
     /// </summary>
     Rejected_Multiply = 0x1C00 | 0x0063,
     /// <summary>
@@ -433,27 +436,27 @@
     /// </summary>
     Rejected_Identification = 0x1C00 | 0x0065,
     /// <summary>
-    /// 不识别
+    /// 不识别，识别
     /// </summary>
     Rejected_Verification = 0x1C00 | 0x0066,
     /// <summary>
-    /// 不识别
+    /// 不识别,光学传感器
     /// </summary>
     Rejected_Optic = 0x1C00 | 0x0067,
     /// <summary>
-    /// 不识别
+    /// 不识别,不允许的面值
     /// </summary>
     Rejected_Inhibit = 0x1C00 | 0x0068,
     /// <summary>
-    /// 不识别
+    /// 不识别，存储
     /// </summary>
     Rejected_Capacity = 0x1C00 | 0x0069,
     /// <summary>
-    /// 不识别
+    /// 不识别，操作
     /// </summary>
     Rejected_Operation = 0x1C00 | 0x006A,
     /// <summary>
-    /// 不识别
+    /// 不识别，长度
     /// </summary>
     Rejected_Length = 0x1C00 | 0x006C,
     /// <summary>
@@ -536,6 +539,27 @@
 
     WaittingOfDecision = 0x8300 | 0x0100,
   }
+
+  //public enum PollRecived_Rejected_SubType : byte {
+  //  Insertion,
+  //    Magnetic,
+  //  Bill,
+  //  Multiply,
+  //  Conveying,
+  //  Identification,
+  //  Verification,
+  //  Optic,
+  //  Inhibit,
+  //  Capacity,
+  //  Operation,
+  //  Length,
+  //  UV,
+  //  Barcode_Unrecognized,
+  //  Barcode_IncorrectNum,
+  //  Barcode_UnknownStart,
+  //  Barcode_UnknownStop,
+  //}
+
   public struct Command {
     /// <summary>
     /// full command data,from SYN to CRC
@@ -558,10 +582,14 @@
     public PollRecivedPackageType? ResponseMark {
       get {
         if (CommandMark.HasValue && CommandMark.Value == CashCodeProtocol.B2B.CommandMark.Poll) {
-          if (ResponseData[2] - 2 == 4) {
-            return (PollRecivedPackageType)((ResponseData[3] << 8) | 0x0000);
+          int EnumTypeValue = 0;
+          if (ResponseData[2] - 2 != 4) {
+            EnumTypeValue = ((ResponseData[3] << 8) & 0xFFFF) | (ResponseData[4]) & 0xFFFF;
+            if (Enum.IsDefined(typeof(PollRecivedPackageType), EnumTypeValue)) {
+              return (PollRecivedPackageType)EnumTypeValue;
+            }
           }
-          return (PollRecivedPackageType)(((ResponseData[3] << 8) & 0xFFFF) | (ResponseData[4]) & 0xFFFF);
+          return (PollRecivedPackageType)((ResponseData[3] << 8) | 0x0000);
         }
         return null;
       }
@@ -581,24 +609,29 @@
   }
 
   public class CashCodeB2BCfg {
-    public byte DeviceType { get; set; } = 0x03;
     /// <summary>
-    /// default=0b11111111
+    /// RS232
+    /// </summary>
+    public string DecicePort { get; set; }
+    /// <summary>
     /// 低
-    ///   Index Description(1=Enable,0=Disable)
-    ///   0     CNY1
-    ///   1     CNY2
-    ///   2     CNY5
-    ///   3     CNY10
-    ///   4     CNY20
-    ///   5     CNY50
-    ///   6     CNY100
-    ///   7     <Reserv,Set 1>
-    ///   ...   <Reserv,Set 1>
+    ///   Index=BillType  Description(1=Enable,0=Disable)
+    ///   0               CNY1                              
+    ///   1               CNY2                              
+    ///   2               CNY5                  
+    ///   3               CNY10                 
+    ///   4               CNY20                 
+    ///   5               CNY50                 
+    ///   6               CNY100                
+    ///   7               <Reserv,Set 1>
+    ///   ...             <Reserv,Set 1>
     /// 高
     /// Example: disable CNY1:0XFE=0b11111110 Enable all :0xFF=0b11111111
     /// </summary>
-    public byte EnableCashType { get; set; } = 0xFF;
-    public string DecicePort { get; set; }
+    public byte EnableCashType { get; set; } = 0b11100000;
+    /// <summary>
+    /// same as 'EnableCashType',set 0 to disable escrow mode.
+    /// </summary>
+    public byte EnableEscrowType { get; set; } = 0;
   }
 }
