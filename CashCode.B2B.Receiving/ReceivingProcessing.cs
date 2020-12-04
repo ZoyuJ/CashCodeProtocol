@@ -254,7 +254,7 @@
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte? Sub { get => Data[4]; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnESCROW?.Invoke(Device, this);
+      public void OnPush() => Device.OnESCROW?.Invoke(Device, this, Sub.Value);
       public void OnPop() { }
 
 
@@ -295,7 +295,7 @@
               Debug.WriteLine("Unknown Cash Value Type");
               //TODO No BillType Or Type Not in Map
             }
-            Device.OnPackedOrStacked?.Invoke(Device, this);
+            Device.OnPackedOrStacked?.Invoke(Device, this, Sub.Value);
             return;
           }
         }
@@ -344,7 +344,7 @@
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte? Sub { get => Data[4]; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnReturned?.Invoke(Device, this);
+      public void OnPush() => Device.OnReturned?.Invoke(Device, this, Sub.Value);
       public void OnPop() { Device.TotalValue -= Device._ReceivedCash.Pop(); }
 
 
@@ -372,7 +372,7 @@
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte? Sub { get => Data[2] - 2 - 3 - 1 > 0 ? Data[4] : (byte)0x00; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnErrorCatched?.Invoke(Device, this);
+      public void OnPush() => Device.OnErrorCatched?.Invoke(Device, this, Sub.Value);
       public void OnPop() { }
 
 
@@ -405,14 +405,14 @@
 
   public delegate void OnInitializeEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
   public delegate void OnAcceptingEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
-  public delegate void OnESCROWEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
+  public delegate void OnESCROWEventHandler(B2BReceivingProcessing Device, IRecevingStep Data, byte Sub);
   public delegate void OnStackingEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
   public delegate void OnIdlingEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
-  public delegate void OnPackedOrStackedEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
-  public delegate void OnReturnedEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
+  public delegate void OnPackedOrStackedEventHandler(B2BReceivingProcessing Device, IRecevingStep Data, byte Sub);
+  public delegate void OnReturnedEventHandler(B2BReceivingProcessing Device, IRecevingStep Data, byte Sub);
   public delegate void OnReturningEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
   public delegate void OnDisabledEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
   public delegate void OnRejectedEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
-  public delegate void OnErrorCatchedEventHandler(B2BReceivingProcessing Device, IRecevingStep Data);
+  public delegate void OnErrorCatchedEventHandler(B2BReceivingProcessing Device, IRecevingStep Data, byte Sub);
 
 }
