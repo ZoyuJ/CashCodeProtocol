@@ -3,6 +3,7 @@
   using System.Collections;
   using System.Collections.Generic;
   using System.Diagnostics;
+  using System.Linq;
   using System.Text;
 
   using CashCodeProtocol.B2B;
@@ -57,6 +58,7 @@
       return SB;
     }
     private void Device_OnRecivedHandler(Command Packet) {
+      Console.WriteLine(Packet.ResponseMark);
       if (Packet.ResponseMark.HasValue && _LastType != Packet.ResponseMark.Value) {
         _LastType = Packet.ResponseMark.Value;
       }
@@ -155,7 +157,7 @@
 
     internal readonly CommandNavigation<IRecevingStep> _StepStack = new CommandNavigation<IRecevingStep>(10);
 
-    public int TotalValue { get; protected set; }
+    public int TotalValue { get=>_ReceivedCash.Sum();  }
     public int Count { get => _ReceivedCash.Count; }
     protected readonly Stack<int> _ReceivedCash = new Stack<int>();
 
@@ -166,7 +168,10 @@
     /// <summary>
     /// 允许放入纸币
     /// </summary>
-    public void EnableReceving() => base.SendEnableBillTypes(_Cfg.EnableCashType, _Cfg.EnableEscrowType);
+    public void EnableReceving() {
+      base.SendEnableBillTypes(_Cfg.EnableCashType, _Cfg.EnableEscrowType);
+      _ReceivedCash.Clear();
+    }
 
 
     /// <summary>
@@ -288,7 +293,7 @@
           if (LastStep.PollResponsed == PollRecivedPackageType.Accepting || LastStep.PollResponsed == PollRecivedPackageType.Stacking) {
             if (Sub.HasValue) {
               var Val = BillTypes_CNY[Sub.Value];
-              Device.TotalValue += Val;
+              //Device.TotalValue += Val;
               Device._ReceivedCash.Push(Val);
             }
             else {
@@ -344,8 +349,10 @@
       public PollRecivedPackageType PollResponsed { get; set; }
       public byte? Sub { get => Data[4]; }
       public byte[] Data { get; set; }
-      public void OnPush() => Device.OnReturned?.Invoke(Device, this, Sub.Value);
-      public void OnPop() { Device.TotalValue -= Device._ReceivedCash.Pop(); }
+      public void OnPush() {
+        Device.OnReturned?.Invoke(Device, this, Sub.Value);
+      }
+      public void OnPop() { }
 
 
       public override string ToString() {
